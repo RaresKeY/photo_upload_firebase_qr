@@ -1,0 +1,22 @@
+{
+  "name": "firebase-project-photos-upload-qr",
+  "version": "1.0.0",
+  "description": "A web app for uploading photos to Firebase",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["firebase", "photo-upload", "qr-code"],
+  "author": "RaresKeY",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^9.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "prettier": "^2.3.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
