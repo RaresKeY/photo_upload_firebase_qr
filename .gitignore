@@ -47,6 +47,9 @@ build/Release
 # Dependency directories
 node_modules/
 
+# Ignore VS Code specific files
+.vscode/
+
 # Optional npm cache directory
 .npm
 
@@ -70,5 +73,4 @@ node_modules/
 .vscode/settings.json
 firebase.js
 public/backgroundEffect.js
-public/upload.js
 public/upload.js
