@@ -69,3 +69,6 @@ node_modules/
 .dataconnect
 .vscode/settings.json
 firebase.js
+public/backgroundEffect.js
+public/upload.js
+public/upload.js

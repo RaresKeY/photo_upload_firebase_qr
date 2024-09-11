@@ -1,14 +1,16 @@
-import { storage } from './firebase.js'; // Import storage from your firebase.js
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"; // Import Firebase storage functions
+console.log('upload.js loaded');
+
+import { storage } from '../firebase.js';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 // Upload File Function
 function uploadFile() {
-  const fileInput = document.getElementById('fileInput');  // Get file input element
-  const file = fileInput.files[0];  // Get the selected file from the input
-  const progressBar = document.getElementById('progressBar');  // Progress bar element
-  const statusMessage = document.getElementById('statusMessage');  // Status message element
+  const fileInput = document.getElementById('fileInput');
+  const file = fileInput.files[0];
+  const progressBar = document.getElementById('progressBar');
+  const statusMessage = document.getElementById('statusMessage');
 
-  // Check if a file has been selected
+  // Check if a file is selected
   if (!file) {
     statusMessage.textContent = 'Please select a file.';
     return;
@@ -16,9 +18,10 @@ function uploadFile() {
 
   // Reset progress bar and status message
   progressBar.style.width = '0%';
+  progressBar.textContent = '';
   statusMessage.textContent = 'Uploading...';
 
-  // Create a reference to Firebase Storage with the file name
+  // Create a storage reference to the file in Firebase Storage
   const storageRef = ref(storage, 'uploads/' + file.name);
 
   // Start the file upload
@@ -27,26 +30,41 @@ function uploadFile() {
   // Monitor the file upload progress
   uploadTask.on('state_changed',
     (snapshot) => {
-      // Calculate the upload progress as a percentage
       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
       progressBar.style.width = progress + '%';
-      progressBar.textContent = `${progress.toFixed(0)}%`;
+      progressBar.textContent = `${progress.toFixed(0)}%`; // Show progress inside the progress bar
       statusMessage.textContent = `Uploading... ${progress.toFixed(0)}%`;
     },
     (error) => {
-      // Handle upload errors
       console.error('Upload failed:', error);
-      statusMessage.textContent = 'Upload failed. Please try again.';
+
+      // Handle different types of errors
+      switch (error.code) {
+        case 'storage/unauthorized':
+          statusMessage.textContent = 'Unauthorized. Please check your permissions.';
+          break;
+        case 'storage/canceled':
+          statusMessage.textContent = 'Upload canceled.';
+          break;
+        case 'storage/unknown':
+          statusMessage.textContent = 'Unknown error occurred. Please try again.';
+          break;
+        default:
+          statusMessage.textContent = 'Upload failed. Please try again.';
+      }
     },
     () => {
-      // Get the download URL when the upload is complete
+      // Upload completed successfully
       getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
         statusMessage.textContent = `Upload successful! File available at: ${downloadURL}`;
-        console.log('File available at', downloadURL);  // Log the file download URL
+        console.log('File available at', downloadURL);
+      }).catch((error) => {
+        statusMessage.textContent = 'Error getting download URL. Please try again.';
+        console.error('Error getting download URL:', error);
       });
     }
   );
 }
 
-// Export the uploadFile function
-window.uploadFile = uploadFile;  // Make the function globally available
+// Make the upload function globally accessible
+window.uploadFile = uploadFile;
