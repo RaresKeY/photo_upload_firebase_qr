@@ -91,37 +91,46 @@
     <script>
       // Your Firebase Config
       const firebaseConfig = {
-        apiKey: "AIzaSyCJrmIVLivBiyeauakGFDR4rEUBppSGd5E",
-        authDomain: "botez---photos-upload-qr-code.firebaseapp.com",
-        projectId: "botez---photos-upload-qr-code",
-        storageBucket: "botez---photos-upload-qr-code.appspot.com",
-        messagingSenderId: "1065245386844",
-        appId: "1:1065245386844:web:46f71f562e468cb47f1e99",
+        apiKey: "AIzaSyBBBILoBkKNTp6M8m8PO-tMgthx__3YB1U",
+        authDomain: "photo-upload-qr.firebaseapp.com",
+        projectId: "photo-upload-qr",
+        storageBucket: "photo-upload-qr.appspot.com",
+        messagingSenderId: "722722859500",
+        appId: "1:722722859500:web:51d79f23a8ce3d130f38c9",
       };
 
       // Initialize Firebase
       const app = firebase.initializeApp(firebaseConfig);
       const storage = firebase.storage();
 
-      // Upload function
-      async function uploadPhoto() {
-        const selectedFile = document.getElementById('fileInput').files[0];
-
-        if (!selectedFile) {
+     // Upload File Function
+      function uploadFile() {
+        const file = document.getElementById('fileInput').files[0];
+        if (!file) {
           document.getElementById('statusMessage').textContent = 'Please select a file.';
           return;
         }
 
-        const filename = selectedFile.name;
-        const storageRef = storage.ref(`uploads/${filename}`);
+        const storageRef = storage.ref('uploads/' + file.name); // Reference the storage path
 
-        try {
-          const uploadTask = await storageRef.put(selectedFile);
-          const downloadUrl = await uploadTask.ref.getDownloadURL();
-          document.getElementById('statusMessage').textContent = `Successfully uploaded ${filename} to ${downloadUrl}`;
-        } catch (error) {
-          document.getElementById('statusMessage').textContent = `Error uploading ${filename}: ${error.message}`;
-        }
+        const uploadTask = storageRef.put(file); // Upload the file
+
+        // Track the progress and completion of the upload
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            document.getElementById('statusMessage').textContent = 'Upload is ' + progress.toFixed(0) + '% done';
+          },
+          (error) => {
+            console.error('Upload failed:', error);
+            document.getElementById('statusMessage').textContent = 'Upload failed.';
+          },
+          () => {
+            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+              document.getElementById('statusMessage').textContent = 'Upload successful! File available at: ' + downloadURL;
+            });
+          }
+        );
       }
     </script>
   </body>
