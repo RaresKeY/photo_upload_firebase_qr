@@ -68,3 +68,4 @@ node_modules/
 # dataconnect generated files
 .dataconnect
 .vscode/settings.json
+firebase.js
