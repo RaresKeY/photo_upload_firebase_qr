@@ -103,20 +103,25 @@
       const app = firebase.initializeApp(firebaseConfig);
       const storage = firebase.storage();
 
-      // Upload Function
-      function uploadFile() {
-        const file = document.getElementById('fileInput').files[0];
-        const storageRef = storage.ref('uploads/' + file.name);
+      // Upload function
+      async function uploadPhoto() {
+        const selectedFile = document.getElementById('fileInput').files[0];
 
-        // Upload the file
-        storageRef
-          .put(file)
-          .then((snapshot) => {
-            alert("File uploaded successfully!");
-          })
-          .catch((error) => {
-            console.error("Upload failed:", error);
-          });
+        if (!selectedFile) {
+          document.getElementById('statusMessage').textContent = 'Please select a file.';
+          return;
+        }
+
+        const filename = selectedFile.name;
+        const storageRef = storage.ref(`uploads/${filename}`);
+
+        try {
+          const uploadTask = await storageRef.put(selectedFile);
+          const downloadUrl = await uploadTask.ref.getDownloadURL();
+          document.getElementById('statusMessage').textContent = `Successfully uploaded ${filename} to ${downloadUrl}`;
+        } catch (error) {
+          document.getElementById('statusMessage').textContent = `Error uploading ${filename}: ${error.message}`;
+        }
       }
     </script>
   </body>
