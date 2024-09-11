@@ -4,7 +4,7 @@
   "description": "A web app for uploading photos to Firebase",
   "main": "index.js",
   "scripts": {
-    "test": "echo 'Building the project...'"
+    "build": "echo 'No build step required'"
   },
   "keywords": ["firebase", "photo-upload", "qr-code"],
   "author": "RaresKeY",
