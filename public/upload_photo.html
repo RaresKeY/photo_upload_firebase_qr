@@ -5,25 +5,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Upload Photo</title>
 
-  <!-- Firebase App and Firebase Storage -->
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Firebase App (v8 CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
 
   <!-- Link to external CSS -->
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="upload-container">
-    <h2>Upload a Photo</h2>
+    <h2>Upload Your Photos</h2>
     <div class="file-input-container">
-      <input type="file" id="fileInput" />
-      <button onclick="uploadFile()">Upload</button>
+      <input type="file" id="fileInput" multiple />
+      <button onclick="uploadFiles()">Upload</button>
     </div>
-    <div id="progressBar" style="width: 0%; height: 20px; background-color: #4caf50;"></div>
+    <div class="progress-container">
+      <div id="progressBar" class="progress-bar" style="width: 0%;"></div>
+    </div>
     <p id="statusMessage"></p>
   </div>
 
-  <!-- Link to external JavaScript -->
-  <script src="upload.js"></script>
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBBBILoBkKNTp6M8m8PO-tMgthx__3YB1U",
+      authDomain: "photo-upload-qr.firebaseapp.com",
+      projectId: "photo-upload-qr",
+      storageBucket: "photo-upload-qr.appspot.com",
+      messagingSenderId: "722722859500",
+      appId: "1:722722859500:web:51d79f23a8ce3d130f38c9",
+      measurementId: "G-C4ZDZW1JEL"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const storage = firebase.storage();
+
+    // Upload Files Function
+    function uploadFiles() {
+      const fileInput = document.getElementById('fileInput');
+      const files = fileInput.files;
+      const progressBar = document.getElementById('progressBar');
+      const statusMessage = document.getElementById('statusMessage');
+
+      // Check if files are selected
+      if (!files.length) {
+        statusMessage.textContent = 'Please select files.';
+        return;
+      }
+
+      // Reset progress bar and status message
+      progressBar.style.width = '0%';
+      statusMessage.textContent = 'Uploading...';
+
+      let totalBytesTransferred = 0;
+      let totalBytes = Array.from(files).reduce((acc, file) => acc + file.size, 0);
+      let completedUploads = 0;
+
+      // Loop through each file and upload it
+      Array.from(files).forEach((file) => {
+        const storageRef = storage.ref('uploads/' + file.name);
+
+        const uploadTask = storageRef.put(file);
+
+        // Monitor file upload progress
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = snapshot.bytesTransferred / snapshot.totalBytes;
+            totalBytesTransferred = Array.from(files).reduce((acc, file) => acc + file.size * progress, 0);
+            const overallProgress = (totalBytesTransferred / totalBytes) * 100;
+            progressBar.style.width = overallProgress + '%';
+          },
+          (error) => {
+            console.error('Upload failed:', error);
+            statusMessage.textContent = 'Upload failed. Please try again.';
+          },
+          () => {
+            completedUploads++;
+            if (completedUploads === files.length) {
+              statusMessage.textContent = 'All uploads successful!';
+            }
+          }
+        );
+      });
+    }
+  </script>
 </body>
 </html>
