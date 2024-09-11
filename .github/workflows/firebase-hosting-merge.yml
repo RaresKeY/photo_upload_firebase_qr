@@ -1,7 +1,9 @@
 name: Deploy to Firebase Hosting on merge
 
 on:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - main
 
@@ -9,6 +11,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    if: github.event.pull_request.merged == true
+    
     steps:
       # Checkout the repository code
       - name: Checkout code

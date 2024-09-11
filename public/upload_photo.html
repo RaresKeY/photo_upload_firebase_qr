@@ -1,150 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Upload Photo</title>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js"></script>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        margin: 0;
-        padding: 0;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Photo</title>
 
-      h2 {
-        color: #333;
-        text-align: center;
-        font-size: 1.5rem;
-      }
+  <!-- Link to external CSS -->
+  <link rel="stylesheet" href="styles.css">
 
-      .upload-container {
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 400px;
-      }
-
-      .file-input-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 20px;
-      }
-
-      input[type="file"] {
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        width: 100%;
-      }
-
-      button {
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        width: 100%;
-        font-size: 1rem;
-      }
-
-      button:hover {
-        background-color: #0056b3;
-      }
-
-      @media (max-width: 600px) {
-        h2 {
-          font-size: 1.2rem;
-        }
-
-        button {
-          font-size: 0.9rem;
-        }
-
-        .upload-container {
-          padding: 15px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="upload-container">
-      <h2>Upload a Photo</h2>
-      <div class="file-input-container">
-        <input type="file" id="fileInput" />
-        <button onclick="uploadFile()">Upload</button>
-      </div>
+  <!-- Firebase App and Firebase Storage -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js"></script>
+</head>
+<body>
+  <div class="upload-container">
+    <h2>Upload a Photo</h2>
+    <div class="file-input-container">
+      <input type="file" id="fileInput" />
+      <button onclick="uploadFile()">Upload</button>
     </div>
+    <div id="progressBar" style="width: 0%; height: 20px; background-color: #4caf50;"></div>
+    <p id="statusMessage"></p>
+  </div>
 
-    <script>
-      // Firebase Config
-      const firebaseConfig = {
-        apiKey: "AIzaSyBBBILoBkKNTp6M8m8PO-tMgthx__3YB1U",
-        authDomain: "photo-upload-qr.firebaseapp.com",
-        projectId: "photo-upload-qr",
-        storageBucket: "photo-upload-qr.appspot.com",
-        messagingSenderId: "722722859500",
-        appId: "1:722722859500:web:51d79f23a8ce3d130f38c9",
-      };
-
-      // Initialize Firebase
-      const app = firebase.initializeApp(firebaseConfig);
-      const storage = firebase.storage();
-
-// Upload File Function
-function uploadFile() {
-      const file = document.getElementById('fileInput').files[0];
-      const progressBar = document.getElementById('progressBar');
-      const statusMessage = document.getElementById('statusMessage');
-
-      if (!file) {
-        statusMessage.textContent = 'Please select a file.';
-        return;
-      }
-
-      // Reset progress bar and status message
-      progressBar.style.width = '0%';
-      statusMessage.textContent = '';
-
-      const storageRef = storage.ref('uploads/' + file.name); // Reference to Firebase Storage
-
-      // Start upload
-      const uploadTask = storageRef.put(file);
-
-      // Track the progress and completion of the upload
-      uploadTask.on('state_changed',
-        (snapshot) => {
-          // Calculate the upload progress
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          progressBar.style.width = progress + '%';
-          progressBar.textContent = progress.toFixed(0) + '%';
-          statusMessage.textContent = `Uploading... ${progress.toFixed(0)}%`;
-        },
-        (error) => {
-          // Handle errors
-          console.error('Upload failed:', error);
-          statusMessage.textContent = 'Upload failed. Please try again.';
-        },
-        () => {
-          // On successful upload, get the download URL
-          uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-            statusMessage.textContent = `Upload successful! File available at: ${downloadURL}`;
-          });
-        }
-      );
-    }
-    </script>
-  </body>
+  <!-- Link to external JavaScript -->
+  <script src="upload.js"></script>
+</body>
 </html>
